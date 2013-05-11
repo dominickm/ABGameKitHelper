@@ -17,7 +17,7 @@
  */
 #define SECRET_KEY @"MySecretKeyHere"
 
-@protocol ABGameKitHelperDelegate
+@protocol MDGameCenterHelper
 
 - (void) matchStarted;
 - (void) matchEnded;
@@ -26,7 +26,7 @@
 
 @end
 
-@interface ABGameKitHelper : NSObject <GKMatchmakerViewControllerDelegate, GKMatchDelegate> 
+@interface MDGameCenterHelper : NSObject <GKMatchmakerViewControllerDelegate, GKMatchDelegate> 
 
 /**
  * Always access class through this singleton
@@ -35,7 +35,7 @@
 
 @property (retain) UIViewController* presentingViewController;
 @property (retain) GKMatch* match;
-@property (assign) id <ABGameKitHelperDelegate> delegate;
+@property (assign) id <MDGameCenterHelper> delegate;
 
 @property (nonatomic, assign, getter = isAuthenticated) BOOL authenticated;
 
@@ -46,22 +46,22 @@
 /**
  * Leaderboards
  */
--(void) reportScore:(long long)aScore forLeaderboard:(NSString*)leaderboardId;
--(void) showLeaderboard:(NSString*)leaderboardId;
+-(void)reportScore:(long long)aScore forLeaderboard:(NSString *)leaderboardId;
+-(void)showLeaderboard:(NSString *)leaderboardId;
 
 
 /**
  * Achievements
  */
--(void) reportAchievement:(NSString*)achievementId percentComplete:(double)percent;
--(void) showAchievements;
--(void) resetAchievements;
+-(void)reportAchievement:(NSString *)achievementId percentComplete:(double)percent;
+-(void)showAchievements;
+-(void)resetAchievements;
 
 
 /**
  * Notifications
  */
--(void) showNotification:(NSString*)title message:(NSString*)message identifier:(NSString*)achievementId;
+-(void)showNotification:(NSString *)title message:(NSString *)message identifier:(NSString *)achievementId;
 
 /**
  * MatchMaking
@@ -69,6 +69,6 @@
 
 - (void)findMatchWithMinPlayers:(int)minPlayers maxPlayers:(int)maxPlayers
 				 viewController:(UIViewController *)viewController
-					   delegate:(id<ABGameKitHelperDelegate>)theDelegate;
+					   delegate:(id<MDGameCenterHelper>)theDelegate;
 
 @end

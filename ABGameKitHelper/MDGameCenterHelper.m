@@ -6,20 +6,20 @@
 //
 
 #import <CommonCrypto/CommonCryptor.h>
-#import "ABGameKitHelper.h"
+#import "MDGameCenterHelper.h"
 
-@interface ABGameKitHelper () <GKLeaderboardViewControllerDelegate, GKAchievementViewControllerDelegate>
+@interface MDGameCenterHelper () <GKLeaderboardViewControllerDelegate, GKAchievementViewControllerDelegate>
 
 @property (nonatomic) BOOL matchStarted;
 
 @end
 
-@implementation ABGameKitHelper
+@implementation MDGameCenterHelper
 
 #pragma mark - Singleton
-+(id) sharedHelper
++(id)sharedHelper
 {
-    static ABGameKitHelper *sharedHelper = nil;
+    static MDGameCenterHelper* sharedHelper = nil;
     static dispatch_once_t once = 0;
     dispatch_once(&once, ^{sharedHelper = [[self alloc] init];});
     return sharedHelper;
@@ -28,7 +28,7 @@
 
 
 #pragma mark - Initializer
--(id) init
+-(id)init
 {
     self = [super init];
     if (self)
@@ -41,9 +41,9 @@
 
 
 #pragma mark - Authenticate
--(void) authenticatePlayer
+-(void)authenticatePlayer
 {
-    GKLocalPlayer *player = [GKLocalPlayer localPlayer];
+    GKLocalPlayer* player = [GKLocalPlayer localPlayer];
     [player setAuthenticateHandler:^(UIViewController *viewController, NSError *error) {
         //
         
@@ -71,7 +71,7 @@
 
 
 #pragma mark - Leaderboard
--(void) reportScore:(long long)aScore forLeaderboard:(NSString*)leaderboardId
+-(void)reportScore:(long long)aScore forLeaderboard:(NSString *)leaderboardId
 {
     GKScore *score = [[GKScore alloc] initWithCategory:leaderboardId];
     score.value = aScore;
@@ -89,7 +89,7 @@
     }];
 }
 
--(void) showLeaderboard:(NSString*)leaderboardId
+-(void)showLeaderboard:(NSString*)leaderboardId
 {
     GKLeaderboardViewController *viewController = [GKLeaderboardViewController new];
     viewController.leaderboardDelegate = self;
@@ -104,7 +104,7 @@
 
 
 #pragma mark - Achievements
--(void) reportAchievement:(NSString*)achievementId percentComplete:(double)percent
+-(void)reportAchievement:(NSString*)achievementId percentComplete:(double)percent
 {
     if (percent > 100.0f) percent = 100.0f;
     
@@ -114,13 +114,13 @@
         [self saveBool:YES key:achievementId];
     }
     
-    GKAchievement *achievement = [[GKAchievement alloc] initWithIdentifier:achievementId];
+    GKAchievement* achievement = [[GKAchievement alloc] initWithIdentifier:achievementId];
     
     if (achievement)
     {
         achievement.percentComplete = percent;
         
-        [achievement reportAchievementWithCompletionHandler:^(NSError *error) {
+        [achievement reportAchievementWithCompletionHandler:^(NSError* error) {
             if (!error)
             {
                 if (ABGAMEKITHELPER_LOGGING) NSLog(@"ABGameKitHelper: Achievement (%@) with %f%% progress reported", achievement.identifier, achievement.percentComplete);
@@ -134,7 +134,7 @@
     }
 }
 
--(void) showAchievements
+-(void)showAchievements
 {
     GKAchievementViewController *viewController = [GKAchievementViewController new];
     viewController.achievementDelegate = self;
@@ -142,9 +142,9 @@
     [[self topViewController] presentViewController:viewController animated:YES completion:nil];
 }
 
--(void) resetAchievements
+-(void)resetAchievements
 {
-    [GKAchievement resetAchievementsWithCompletionHandler:^(NSError *error) {
+    [GKAchievement resetAchievementsWithCompletionHandler:^(NSError* error) {
         if (!error)
         {
             if (ABGAMEKITHELPER_LOGGING) NSLog(@"ABGameKitHelper: Achievements reset successfully.");
@@ -159,7 +159,7 @@
 
 
 #pragma mark - Notifications
--(void) showNotification:(NSString*)title message:(NSString*)message identifier:(NSString*)achievementId
+-(void)showNotification:(NSString *)title message:(NSString *)message identifier:(NSString *)achievementId
 {
     //Show notification only if it hasn't been achieved yet
     if (![self boolForKey:achievementId])
@@ -172,10 +172,10 @@
 
 #pragma mark - Caching
 #pragma mark - Caching Scores
--(void) cacheScore:(GKScore*)aScore
+-(void)cacheScore:(GKScore *)aScore
 {
     //Retrieve cached scores
-    NSMutableArray *scores = [self objectForKey:@"cachedScores"];
+    NSMutableArray* scores = [self objectForKey:@"cachedScores"];
     
     //Add new score to array
     [scores addObject:aScore];
@@ -184,10 +184,10 @@
     [self saveObject:scores key:@"cachedScores"];
 }
 
--(void) reportCachedScores
+-(void)reportCachedScores
 {
     //Retrieve cached scores
-    NSMutableArray *scores = [self objectForKey:@"cachedScores"];
+    NSMutableArray* scores = [self objectForKey:@"cachedScores"];
     
     if (ABGAMEKITHELPER_LOGGING) NSLog(@"ABGameKitHelper: Attempting to report %i cached scores...", scores.count);
     
@@ -204,14 +204,14 @@
     }];
 }
 
--(void) removeAllCachedScores
+-(void)removeAllCachedScores
 {
     [self saveObject:[NSMutableArray new] key:@"cachedScores"];
 }
 
 
 #pragma mark - Caching Achievements
--(void) cacheAchievement:(GKAchievement*)achievement
+-(void)cacheAchievement:(GKAchievement*)achievement
 {
     //Retrieve cached achievements
     NSMutableArray *achievements = [self objectForKey:@"cachedAchievements"];
@@ -223,14 +223,14 @@
     [self saveObject:achievements key:@"cachedAchievements"];
 }
 
--(void) reportCachedAchievements
+-(void)reportCachedAchievements
 {
     //Retrieve cached achievements
-    NSMutableArray *achievements = [self objectForKey:@"cachedAchievements"];
+    NSMutableArray* achievements = [self objectForKey:@"cachedAchievements"];
     
     if (ABGAMEKITHELPER_LOGGING) NSLog(@"ABGameKitHelper: Attempting to report %i cached achievements...", achievements.count);
     
-    [GKAchievement reportAchievements:achievements withCompletionHandler:^(NSError *error) {
+    [GKAchievement reportAchievements:achievements withCompletionHandler:^(NSError* error) {
         if (!error)
         {
             [self removeAllCachedAchievements];
@@ -243,7 +243,7 @@
     }];
 }
 
--(void) removeAllCachedAchievements
+-(void)removeAllCachedAchievements
 {
     [self saveObject:[NSMutableArray new] key:@"cachedAchievements"];
 }
@@ -251,19 +251,19 @@
 
 
 #pragma mark - Data Persistance
--(NSString*) filePath
+-(NSString *)filePath
 {
-    NSString *fileExt = @".abgk";
-    NSString *fileName = [NSString stringWithFormat:@"%@%@", [[self appName] lowercaseString], fileExt];
+    NSString* fileExt = @".abgk";
+    NSString* fileName = [NSString stringWithFormat:@"%@%@", [[self appName] lowercaseString], fileExt];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:fileName];
+    NSString* documentsDirectory = [paths objectAtIndex:0];
+    NSString* path = [documentsDirectory stringByAppendingPathComponent:fileName];
     return path;
 }
 
--(NSMutableDictionary*) dataDictionary
+-(NSMutableDictionary *)dataDictionary
 {
-    NSData *binaryFile = [NSData dataWithContentsOfFile:[self filePath]];
+    NSData* binaryFile = [NSData dataWithContentsOfFile:[self filePath]];
     NSMutableDictionary *dictionary = nil;
     
     if (binaryFile == nil)
@@ -272,17 +272,17 @@
     }
     else
     {
-        NSData *decryptedData = [self decryptData:binaryFile withKey:SECRET_KEY];
+        NSData* decryptedData = [self decryptData:binaryFile withKey:SECRET_KEY];
         dictionary = [NSKeyedUnarchiver unarchiveObjectWithData:decryptedData];
     }
     
     return dictionary;
 }
 
--(void) saveData:(NSData*)data key:(NSString*)key
+-(void)saveData:(NSData *)data key:(NSString *)key
 {
     BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:[self filePath]];
-    NSMutableDictionary *tempDic = nil;
+    NSMutableDictionary* tempDic = nil;
     if (fileExists == NO)
     {
         tempDic = [NSMutableDictionary new];
@@ -293,15 +293,15 @@
     
     [tempDic setObject:data forKey:key];
     
-    NSData *dicData = [NSKeyedArchiver archivedDataWithRootObject:tempDic];
-    NSData *encryptedData = [self encryptData:dicData withKey:SECRET_KEY];
+    NSData* dicData = [NSKeyedArchiver archivedDataWithRootObject:tempDic];
+    NSData* encryptedData = [self encryptData:dicData withKey:SECRET_KEY];
     [encryptedData writeToFile:[self filePath] atomically:YES];
 }
 
--(NSData*) dataForKey:(NSString*)key
+-(NSData*)dataForKey:(NSString *)key
 {
-    NSMutableDictionary *tempDic = [self dataDictionary];
-    NSData *loadedData = [tempDic objectForKey:key];
+    NSMutableDictionary* tempDic = [self dataDictionary];
+    NSData* loadedData = [tempDic objectForKey:key];
     
     if (loadedData)
     {
@@ -311,13 +311,13 @@
     return nil;
 }
 
--(void) saveObject:(id<NSCoding>)object key:(NSString*)key
+-(void)saveObject:(id<NSCoding>)object key:(NSString *)key
 {
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object];
+    NSData* data = [NSKeyedArchiver archivedDataWithRootObject:object];
     [self saveData:data key:key];
 }
 
--(id) objectForKey:(NSString*)key
+-(id)objectForKey:(NSString *)key
 {
     NSData *data = [self dataForKey:key];
     if (data)
@@ -327,16 +327,16 @@
     return nil;
 }
 
--(void) saveBool:(BOOL)boolean key:(NSString*)key
+-(void)saveBool:(BOOL)boolean key:(NSString *)key
 {
     NSNumber *number = [NSNumber numberWithBool:boolean];
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:number];
     [self saveData:data key:key];
 }
 
--(BOOL) boolForKey:(NSString*)key
+-(BOOL)boolForKey:(NSString *)key
 {
-    NSData *data = [self dataForKey:key];
+    NSData* data = [self dataForKey:key];
     if (data)
     {
         return [[NSKeyedUnarchiver unarchiveObjectWithData:data] boolValue];
@@ -347,13 +347,13 @@
 
 
 #pragma mark - Helper
--(NSString*) appName
+-(NSString *)appName
 {
-    NSString *bundlePath = [[[NSBundle mainBundle] bundleURL] lastPathComponent];
+    NSString* bundlePath = [[[NSBundle mainBundle] bundleURL] lastPathComponent];
     return [[bundlePath stringByDeletingPathExtension] lowercaseString];
 }
 
--(UIViewController*) topViewController
+-(UIViewController *)topViewController
 {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
     while (topController.presentedViewController)
@@ -363,7 +363,7 @@
     return topController;
 }
 
--(NSData*) makeCryptedVersionOfData:(NSData*)data withKeyData:(const void*)keyData ofLength:(int) keyLength decrypt:(bool)decrypt
+-(NSData *)makeCryptedVersionOfData:(NSData*)data withKeyData:(const void*)keyData ofLength:(int) keyLength decrypt:(bool)decrypt
 {
 	int keySize = kCCKeySizeAES256;
     char key[kCCKeySizeAES256];
@@ -396,13 +396,13 @@
 	return nil;
 }
 
-- (NSData*) encryptData:(NSData*)data withKey:(NSString*)key
+- (NSData *)encryptData:(NSData*)data withKey:(NSString*)key
 {
     NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
 	return [self makeCryptedVersionOfData:data withKeyData:[keyData bytes] ofLength:[keyData length] decrypt:false];
 }
 
-- (NSData*) decryptData:(NSData*)data withKey:(NSString*)key
+- (NSData *)decryptData:(NSData*)data withKey:(NSString*)key
 {
 	NSData *keyData = [key dataUsingEncoding:NSUTF8StringEncoding];
     return [self makeCryptedVersionOfData:data withKeyData:[keyData bytes] ofLength:[keyData length] decrypt:true];
@@ -411,7 +411,7 @@
 
 
 #pragma mark - GKLeaderboardViewControllerDelegate
--(void) leaderboardViewControllerDidFinish:(GKLeaderboardViewController*)viewController
+-(void)leaderboardViewControllerDidFinish:(GKLeaderboardViewController*)viewController
 {
     [viewController dismissViewControllerAnimated:YES completion:nil];
 }
@@ -419,16 +419,16 @@
 
 
 #pragma mark - GKAchievementViewControllerDelegate
--(void) achievementViewControllerDidFinish:(GKAchievementViewController *)viewController
+-(void)achievementViewControllerDidFinish:(GKAchievementViewController *)viewController
 {
     [viewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Matchmaking
 
-- (void) findMatchWithMinPlayers:(int)minPlayers maxPlayers:(int)maxPlayers
+- (void)findMatchWithMinPlayers:(int)minPlayers maxPlayers:(int)maxPlayers
 				 viewController:(UIViewController *)viewController
-					   delegate:(id<ABGameKitHelperDelegate>)theDelegate
+					   delegate:(id<MDGameCenterHelper>)theDelegate
 {
     if (![self isAuthenticated])
 	{
@@ -536,7 +536,8 @@
 }
 
 // match found
-- (void)matchmakerViewController:(GKMatchmakerViewController *)viewController didFindMatch:(GKMatch *)theMatch {
+- (void)matchmakerViewController:(GKMatchmakerViewController *)viewController didFindMatch:(GKMatch *)theMatch
+{
     [_presentingViewController dismissModalViewControllerAnimated:YES];
     self.match = theMatch;
     _match.delegate = self;
