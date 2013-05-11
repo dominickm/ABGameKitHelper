@@ -19,9 +19,9 @@
 
 @protocol MDGameCenterHelper
 
-- (void) matchStarted;
-- (void) matchEnded;
-- (void) match:(GKMatch*)match didReceiveData:(NSData *)data
+- (void)matchStarted;
+- (void)matchEnded;
+- (void)match:(GKMatch*)match didReceiveData:(NSData *)data
    fromPlayer:(NSString*)playerID;
 
 @end
