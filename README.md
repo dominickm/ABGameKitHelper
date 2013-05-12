@@ -1,5 +1,7 @@
-ABGameKitHelper
+MDGameCenter 
 ===============
+
+Special thanks to the devs of ABGameKitHelper -- the project that this project is based on.
 
 Objective-C Helper class to ease interaction with Apple&#39;s GameKit API
 
