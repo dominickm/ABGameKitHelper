@@ -430,10 +430,6 @@
 				 viewController:(UIViewController *)viewController
 					   delegate:(id<MDGameCenterHelper>)theDelegate
 {
-    if (![self isAuthenticated])
-	{
-		[self authenticatePlayer];
-	}
 	_matchStarted = NO;
 	self.match = nil;
 	self.presentingViewController = viewController;
