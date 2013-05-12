@@ -33,9 +33,9 @@
  * Call it once on application start to authenticate local player
  */
 
-@property (retain) UIViewController* presentingViewController;
-@property (retain) GKMatch* match;
-@property (assign) id <MDGameCenterHelper> delegate;
+@property (nonatomic, weak) UIViewController* presentingViewController;
+@property (nonatomic) GKMatch* match;
+@property (nonatomic) id <MDGameCenterHelper> delegate;
 
 @property (nonatomic, assign, getter = isAuthenticated) BOOL authenticated;
 
